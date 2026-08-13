@@ -21,12 +21,24 @@ async function fetchPurchasesFromSheet() {
         const dataFromSheet = await response.json();
 
         if (Array.isArray(dataFromSheet) && dataFromSheet.length > 0) {
-            purchases = dataFromSheet;
+            purchases = dataFromSheet.map(item => ({
+                id: String(item.id || ''),
+                itemName: item.itemName || 'No Name',
+                channel: item.channel || 'N/A',
+                category: item.category || 'General',
+                status: item.status || 'Pending',
+                date: item.date ? String(item.date).split('T')[0] : '',
+                itemPrice: Number(item.itemPrice) || 0,
+                itemPaymentStatus: item.itemPaymentStatus || 'Not Applicable',
+                emsPrice: Number(item.emsPrice) || 0,
+                emsPaymentStatus: item.emsPaymentStatus || 'Not Applicable',
+                postagePrice: Number(item.postagePrice) || 0,
+                postagePaymentStatus: item.postagePaymentStatus || 'Not Applicable',
+                remarks: item.remarks || ''
+            }));
+
             savePurchases();
-            
-            // TUKAR DI SINI: Tukar renderPurchases() -> renderAll()
             renderAll(); 
-            
             console.log("Data import successfully");
         }
     } catch (error) {
@@ -252,11 +264,14 @@ function getFilteredPurchases() {
     });
 
     filtered.sort((a, b) => {
-        const totalA = (a.itemPrice || 0) + (a.emsPrice || 0) + (a.postagePrice || 0);
-        const totalB = (b.itemPrice || 0) + (b.emsPrice || 0) + (b.postagePrice || 0);
+        const totalA = (Number(a.itemPrice) || 0) + (Number(a.emsPrice) || 0) + (Number(a.postagePrice) || 0);
+        const totalB = (Number(b.itemPrice) || 0) + (Number(b.emsPrice) || 0) + (Number(b.postagePrice) || 0);
 
-        if (sort === "NEWEST") return new Date(b.date || 0) - new Date(a.date || 0);
-        if (sort === "OLDEST") return new Date(a.date || 0) - new Date(b.date || 0);
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+        if (sort === "NEWEST") return dateB - dateA;
+        if (sort === "OLDEST") return dateA - dateB;
         if (sort === "PRICE_HIGH") return totalB - totalA;
         if (sort === "PRICE_LOW") return totalA - totalB;
         return 0;
