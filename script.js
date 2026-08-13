@@ -1,6 +1,6 @@
 
 const STORAGE_KEY = "strawberry_matcha_purchases";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwsxZC9c9bdpx4zMbjXTgpVyPdbUQqlGGsTqeAA2XpCZPFtkyK2e0g5_zCcxwMnGx5hnw/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzyW5_Ij6tFqCb_lxOcoT-8uhwGuEmkBYahZVxXyuY735amN_LBOXsEJkEi3Vn1C3_aEw/exec";
 
 let purchases = loadPurchases();
 
