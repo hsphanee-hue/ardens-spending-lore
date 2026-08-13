@@ -20,15 +20,13 @@ async function fetchPurchasesFromSheet() {
         const response = await fetch(GOOGLE_SHEET_URL);
         const dataFromSheet = await response.json();
 
-        if (Array.isArray(dataFromSheet)) {
-            
+        if (Array.isArray(dataFromSheet) && dataFromSheet.length > 0) {
             purchases = dataFromSheet;
-            
             savePurchases();
             
-            if (typeof renderPurchases === "function") {
-                renderPurchases();
-            }
+            // TUKAR DI SINI: Tukar renderPurchases() -> renderAll()
+            renderAll(); 
+            
             console.log("Data import successfully");
         }
     } catch (error) {
