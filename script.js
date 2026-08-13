@@ -1,6 +1,6 @@
 
 const STORAGE_KEY = "strawberry_matcha_purchases";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxbJYcAdNyV00MVr1OG6imqMP1ItP5cvtsKima0Iw9uMURVR19GdNZRCBU3Q2wE4jknPg/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwsxZC9c9bdpx4zMbjXTgpVyPdbUQqlGGsTqeAA2XpCZPFtkyK2e0g5_zCcxwMnGx5hnw/exec";
 
 let purchases = loadPurchases();
 
@@ -14,6 +14,31 @@ function loadPurchases() {
         return [];
     }
 }
+
+async function fetchPurchasesFromSheet() {
+    try {
+        const response = await fetch(GOOGLE_SHEET_URL);
+        const dataFromSheet = await response.json();
+
+        if (Array.isArray(dataFromSheet)) {
+            
+            purchases = dataFromSheet;
+            
+            savePurchases();
+            
+            if (typeof renderPurchases === "function") {
+                renderPurchases();
+            }
+            console.log("Data import successfully");
+        }
+    } catch (error) {
+        console.error("Data import failed:", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchPurchasesFromSheet();
+});
 
 // Save data to LocalStorage
 function savePurchases() {
