@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arden's purchase tracker</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#72A2D8">
+
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+
+</head>
+<body>
+
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">✦</div>
+                <div>
+                    <h1>ar댕크크’s vault</h1>
+                    <span>a live documentation of my poor decisions</span>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-item active" data-page="dashboardPage">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-page="purchasesPage">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <span>All Purchases</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-note">
+                <span>✦</span>
+                <p>every purchase has a story. unfortunately.</p>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+            <!-- MOBILE HEADER -->
+            <div class="mobile-header">
+                <div>
+                    <h1>ar댕크크’s vault</h1>
+                    <span>a live documentation of my poor decisions</span>
+                </div>
+                <button class="menu-button" id="menuToggle" aria-label="Toggle Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- DASHBOARD PAGE -->
+            <section id="dashboardPage" class="page active-page">
+                <div class="welcome">
+                    <div>
+                        <p class="eyebrow">arden’s spending lore</p>
+                        <h2>Hi, arden.</h2>
+                        <p class="subtitle">Here is an overview of your receipts, regrets & random little treats</p>
+                    </div>
+                    <button class="primary-button" id="addPurchaseBtn1">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="12" y1="19" x2="12" y2="5"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add New Purchase</span>
+                    </button>
+                </div>
+
+                <!-- STATS GRID -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-heading">
+                            <span>Secured</span>
+                            <div class="stat-symbol blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <strong id="statSecured">0</strong>
+                        <small>Items secured</small>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-heading">
+                            <span>Pending</span>
+                            <div class="stat-symbol yellow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </div>
+                        </div>
+                        <strong id="statPending">0</strong>
+                        <small>Shipping started</small>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-heading">
+                            <span>Received</span>
+                            <div class="stat-symbol blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            </div>
+                        </div>
+                        <strong id="statReceived">0</strong>
+                        <small>Delivered successfully</small>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-heading">
+                            <span>Not Secured / Cancelled</span>
+                            <div class="stat-symbol yellow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            </div>
+                        </div>
+                        <strong id="statOther">0</strong>
+                        <small>Cancelled / Missed</small>
+                    </div>
+                </div>
+
+                <!-- MONEY GRID -->
+                <div class="money-grid">
+                    <div class="money-card payment-card">
+                        <div class="money-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        </div>
+                        <div class="money-content">
+                            <p>PENDING PAYMENTS</p>
+                            <strong id="statPendingPayment">RM 0.00</strong>
+                            <span>The damage yet to come</span>
+                        </div>
+                    </div>
+
+                    <div class="money-card refund-card">
+                        <div class="money-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                        </div>
+                        <div class="money-content">
+                            <p>PENDING REFUNDS</p>
+                            <strong id="statPendingRefund">RM 0.00</strong>
+                            <span>Total my missing funds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAYMENT BREAKDOWN -->
+                <div class="payment-breakdown">
+                    <div class="section-heading">
+                        <h3>Damage Breakdown</h3>
+                    </div>
+                    <div class="breakdown-grid">
+                        <div class="breakdown-card">
+                            <span class="breakdown-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            </span>
+                            <div>
+                                <small>Item Cost</small>
+                                <strong id="breakdownItem">RM 0.00</strong>
+                            </div>
+                        </div>
+                        <div class="breakdown-card">
+                            <span class="breakdown-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                            </span>
+                            <div>
+                                <small>EMS / Shipping</small>
+                                <strong id="breakdownEms">RM 0.00</strong>
+                            </div>
+                        </div>
+                        <div class="breakdown-card">
+                            <span class="breakdown-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </span>
+                            <div>
+                                <small>Local Postage</small>
+                                <strong id="breakdownPostage">RM 0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECENT PURCHASES -->
+                <div class="section-heading">
+                    <h3>Recent Damages</h3>
+                    <button class="text-button" id="viewAllBtn">View All →</button>
+                </div>
+
+                <div class="purchase-container" id="recentPurchasesList">
+                    
+                </div>
+
+                <div class="empty-state" id="emptyDashboard" style="display: none;">
+                    <div class="empty-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <h4>No purchases recorded yet</h4>
+                </div>
+
+                <!-- FINANCIAL REALITY CHECK -->
+                <div class="financial-reality">
+                    <div class="reality-decoration">✦ ✦ ✦</div>
+                    <p class="reality-label">FINANCIAL REALITY CHECK</p>
+                    <h3>Total Accumulated Spending</h3>
+                    <div class="total-spent" id="totalSpent">RM 0.00</div>
+                    <p class="reality-note">Grand total spent across all items that could’ve been savings</p>
+
+                    <div class="reality-details">
+                        <div>
+                            <span>Total Damages</span>
+                            <strong id="totalCount">0 items</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ALL PURCHASES PAGE -->
+            <section id="purchasesPage" class="page">
+                <div class="welcome">
+                    <div>
+                        <p class="eyebrow">where it all went</p>
+                        <h2>THE DAMAGE</h2>
+                        <p class="subtitle">Search, filter, edit or delete the evidence.</p>
+                    </div>
+                    <button class="primary-button" id="addPurchaseBtn2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add New Purchase</span>
+                    </button>
+                </div>
+
+                <!-- TOOLBAR -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="searchInput" placeholder="Search item, channel, or ID...">
+                    </div>
+
+                    <select id="statusFilter">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Secured">Secured</option>
+                        <option value="Not Secured">Not Secured</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Received">Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+
+                    <select id="sortOrder">
+                        <option value="NEWEST">Newest First</option>
+                        <option value="OLDEST">Oldest First</option>
+                        <option value="PRICE_HIGH">Price: High to Low</option>
+                        <option value="PRICE_LOW">Price: Low to High</option>
+                    </select>
+                </div>
+
+                <!-- TABLE -->
+                <div class="purchase-container desktop-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ITEM DETAILS</th>
+                                <th>CHANNEL & CATEGORY</th>
+                                <th>STATUS</th>
+                                <th>PAYMENTS</th>
+                                <th>TOTAL AMOUNT</th>
+                                <th style="text-align: right;">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchasesTableBody">
+                            
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" id="emptyPurchases" style="display: none;">
+                    <div class="empty-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <h4>No matching purchases found</h4>
+                    <p>Try adjusting your search terms or filters.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL FORM -->
+    <div class="modal-overlay" id="purchaseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalTitle">Add New Purchase</h3>
+                    <p class="subtitle" style="margin-top: 4px; font-size: 12px;">Okay so what did you buy this time?</p>
+                </div>
+                <button class="close-button" id="closeModalBtn">&times;</button>
+            </div>
+
+            <form id="purchaseForm">
+                <input type="hidden" id="editIndex" value="-1">
+
+                <div class="form-grid">
+                    
+                    <div class="form-group full">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" required placeholder="e.g. Enhypen Orange Blood Album (Weverse)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="channel">Purchase Channel / GO</label>
+                        <input type="text" id="channel" placeholder="e.g. Twitter @seller / Shopee">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <input type="text" id="category" placeholder="e.g. Album, Photocard, Merch">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Overall Status</label>
+                        <select id="status">
+                            <option value="Pending">Pending</option>
+                            <option value="Secured">Secured</option>
+                            <option value="Not Secured">Not Secured</option>
+                            <option value="Received">Received</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Purchase Date</label>
+                        <input type="date" id="date">
+                    </div>
+
+                    <div class="form-group full" style="margin-top: 10px;">
+                        <label style="color: var(--strawberry-red);">PRICING & PAYMENT STATUS</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemPrice">Item Price (RM)</label>
+                        <input type="number" step="0.01" id="itemPrice" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemPaymentStatus">Item Payment</label>
+                        <select id="itemPayment">
+                            <option value="Not Applicable">Not Applicable</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Refund Pending">Refund Pending</option>
+                            <option value="Refunded">Refunded</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emsPrice">EMS / Shipping (RM)</label>
+                        <input type="number" step="0.01" id="emsPrice" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emsPaymentStatus">EMS Payment</label>
+                        <select id="emsPaymentStatus">
+                            <option value="Not Applicable">Not Applicable</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Refund Pending">Refund Pending</option>
+                            <option value="Refunded">Refunded</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postagePrice">Local Postage (RM)</label>
+                        <input type="number" step="0.01" id="postagePrice" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postagePaymentStatus">Postage Payment</label>
+                        <select id="postagePaymentStatus">
+                            <option value="Not Applicable">Not Applicable</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Refund Pending">Refund Pending</option>
+                            <option value="Refunded">Refunded</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Total Calculated Cost</label>
+                        <div class="total-preview" id="totalPreview">RM 0.00</div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="remarks">Notes / Remarks</label>
+                        <textarea id="remarks" rows="2" placeholder="e.g. Tracking number, seller updates..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="secondary-button" id="cancelModalBtn">Cancel</button>
+                    <button type="submit" class="primary-button">Save Purchase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
