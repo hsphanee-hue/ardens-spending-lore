@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'app-store-v2';
+const CACHE_NAME = 'app-store-v3';
 
 const ASSETS_TO_CACHE = [
   './',

@@ -1,4 +1,3 @@
-
 const STORAGE_KEY = "strawberry_matcha_purchases";
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzyW5_Ij6tFqCb_lxOcoT-8uhwGuEmkBYahZVxXyuY735amN_LBOXsEJkEi3Vn1C3_aEw/exec";
 
@@ -46,10 +45,6 @@ async function fetchPurchasesFromSheet() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchPurchasesFromSheet();
-});
-
 // Save data to LocalStorage
 function savePurchases() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(purchases));
@@ -89,13 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
     dateInput = document.getElementById("date");
     
     itemPriceInput = document.getElementById("itemPrice");
-    itemPaymentInput = document.getElementById("itemPayment"); // Matches HTML ID
+    itemPaymentInput = document.getElementById("itemPayment");
     
     emsPriceInput = document.getElementById("emsPrice");
-    emsPaymentInput = document.getElementById("emsPaymentStatus"); // Matches HTML ID
+    emsPaymentInput = document.getElementById("emsPaymentStatus");
     
     postagePriceInput = document.getElementById("postagePrice");
-    postagePaymentInput = document.getElementById("postagePaymentStatus"); // Matches HTML ID
+    postagePaymentInput = document.getElementById("postagePaymentStatus");
     
     remarksInput = document.getElementById("remarks");
     totalPreview = document.getElementById("totalPreview");
@@ -111,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initFormCalculations();
     initFilters();
     renderAll();
+
+    // Fetch latest from sheet
+    fetchPurchasesFromSheet();
 });
 
 function initNavigation() {
@@ -205,8 +203,11 @@ function handleFormSubmit(e) {
     e.preventDefault();
 
     const idx = parseInt(editIndexInput.value, 10);
+    const isEdit = idx >= 0;
+
     const itemData = {
-        id: idx >= 0 ? purchases[idx].id : `PUR-${String(Date.now()).slice(-4)}`,
+        action: isEdit ? "update" : "add",
+        id: isEdit ? purchases[idx].id : `PUR-${String(Date.now()).slice(-4)}`,
         itemName: itemNameInput.value.trim(),
         channel: channelInput.value.trim() || "N/A",
         category: categoryInput.value.trim() || "General",
@@ -221,12 +222,14 @@ function handleFormSubmit(e) {
         remarks: remarksInput.value.trim()
     };
 
-    if (idx >= 0) {
+    if (isEdit) {
         purchases[idx] = itemData; 
     } else {
         purchases.unshift(itemData); 
-        syncToGoogleSheet(itemData); // Sync to Google Sheet
     }
+
+    // Auto-sync ke Google Sheets (Sama ada ADD atau EDIT)
+    syncToGoogleSheet(itemData);
 
     savePurchases();
     closeModal();
@@ -234,7 +237,7 @@ function handleFormSubmit(e) {
 }
 
 function syncToGoogleSheet(data) {
-    if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("PASTE_WEB_APP_URL")) return;
+    if (!GOOGLE_SHEET_URL) return;
 
     fetch(GOOGLE_SHEET_URL, {
         method: "POST",
@@ -289,7 +292,7 @@ function renderAll() {
 function renderDashboardStats() {
     let secured = 0, pending = 0, received = 0, other = 0;
     let pendingPaymentSum = 0;
-    let pendingRefundSum = 0; // "They Owe Me"
+    let pendingRefundSum = 0;
     let breakdownItemSum = 0, breakdownEmsSum = 0, breakdownPostageSum = 0;
     let grandTotalSpent = 0;
 
@@ -299,13 +302,11 @@ function renderDashboardStats() {
         const postP = item.postagePrice || 0;
         const total = itemP + emsP + postP;
 
-        // Overall Item Status Counter
         if (item.status === "Secured") secured++;
         else if (item.status === "Pending") pending++;
         else if (item.status === "Received") received++;
-        else other++; // Not Secured / Cancelled
+        else other++;
 
-        // Hanya kira RM ke Grand Total & Breakdown jika barang BUKAN "Not Secured" atau "Cancelled"
         const isSpent = item.status !== "Not Secured" && item.status !== "Cancelled";
 
         if (isSpent) {
@@ -315,18 +316,15 @@ function renderDashboardStats() {
             grandTotalSpent += total;
         }
 
-        // LOGIC 1: PENDING PAYMENTS (Barang bertanda 'Unpaid')
         if (item.itemPaymentStatus === "Unpaid") pendingPaymentSum += itemP;
         if (item.emsPaymentStatus === "Unpaid") pendingPaymentSum += emsP;
         if (item.postagePaymentStatus === "Unpaid") pendingPaymentSum += postP;
 
-        // LOGIC 2: THEY OWE ME / PENDING REFUNDS (Status = "Refund Pending")
         if (item.itemPaymentStatus === "Refund Pending") pendingRefundSum += itemP;
         if (item.emsPaymentStatus === "Refund Pending") pendingRefundSum += emsP;
         if (item.postagePaymentStatus === "Refund Pending") pendingRefundSum += postP;
     });
 
-    // Update Dashboard DOM
     const elSecured = document.getElementById("statSecured");
     const elPending = document.getElementById("statPending");
     const elReceived = document.getElementById("statReceived");
@@ -351,7 +349,6 @@ function renderDashboardStats() {
     if (elBkEms) elBkEms.textContent = `RM ${breakdownEmsSum.toFixed(2)}`;
     if (elBkPost) elBkPost.textContent = `RM ${breakdownPostageSum.toFixed(2)}`;
 
-    // Financial Reality Check (Secured Rate & Avg Price DIBUANG)
     const elTotalSpent = document.getElementById("totalSpent");
     const elTotalCount = document.getElementById("totalCount");
 
@@ -456,9 +453,20 @@ function renderTable() {
 
 window.deletePurchase = function(idx) {
     if (confirm("girl are you sure about this?")) {
+        const deletedItem = purchases[idx];
+        
+        // Remove from memory & local storage
         purchases.splice(idx, 1);
         savePurchases();
         renderAll();
+
+        // Sync delete action to Google Sheets
+        if (deletedItem && deletedItem.id) {
+            syncToGoogleSheet({
+                action: "delete",
+                id: deletedItem.id
+            });
+        }
     }
 };
 
